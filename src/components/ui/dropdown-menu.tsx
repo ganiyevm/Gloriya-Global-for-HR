@@ -22,6 +22,10 @@ interface DropdownMenuItemProps {
   className?: string;
 }
 
+interface DropdownMenuSeparatorProps {
+  className?: string;
+}
+
 const DropdownMenuContext = React.createContext<{
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -121,5 +125,16 @@ export function DropdownMenuItem({ children, onClick, className }: DropdownMenuI
     >
       {children}
     </button>
+  );
+}
+
+export function DropdownMenuSeparator({ className }: DropdownMenuSeparatorProps) {
+  return (
+    <div
+      className={cn(
+        '-mx-1 my-1 h-px bg-muted',
+        className
+      )}
+    />
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Trash2, 
   RotateCcw, 
@@ -22,11 +22,13 @@ import {
   DialogTrigger,
 } from './ui/dialog';
 import { useStore } from '../store/useStore';
+import { useAuth } from '../contexts/AuthContext';
 import { format } from 'date-fns';
 import { useLanguage } from '../i18n';
 
 export function AdminPanel() {
   const { t } = useLanguage();
+  const { user, logout } = useAuth();
   const [showClearDialog, setShowClearDialog] = useState(false);
   const [showRollbackDialog, setShowRollbackDialog] = useState(false);
   const [selectedRollbackId, setSelectedRollbackId] = useState<string | null>(null);
@@ -38,6 +40,37 @@ export function AdminPanel() {
     clearAllData,
     rollbackImport
   } = useStore();
+
+  // Check if user is admin every 10 seconds
+  useEffect(() => {
+    const checkInterval = setInterval(() => {
+      if (user?.role !== 'admin') {
+        console.warn('Non-admin user detected in AdminPanel, logging out');
+        logout();
+      }
+    }, 10 * 1000); // 10 sekundda bir tekshir
+
+    return () => clearInterval(checkInterval);
+  }, [user, logout]);
+
+  // If not admin, show warning
+  if (user?.role !== 'admin') {
+    return (
+      <Card className="border-destructive/50">
+        <CardContent className="pt-6">
+          <div className="flex items-center gap-4 p-4 bg-destructive/10 rounded-lg">
+            <AlertTriangle className="h-8 w-8 text-destructive" />
+            <div>
+              <p className="font-semibold text-destructive">{t.admin.title || 'Kirish rad etildi'}</p>
+              <p className="text-sm text-muted-foreground">
+                {t.admin.dbStatusDesc || 'Faqat admin foydalanuvchilar bu sahifaga kirishi mumkin'}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const handleClearData = () => {
     clearAllData();

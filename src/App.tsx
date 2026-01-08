@@ -9,7 +9,8 @@ import {
   Sun,
   Menu,
   X,
-  Globe
+  Globe,
+  LogOut
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Button } from './components/ui/button';
@@ -18,19 +19,21 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from './components/ui/dropdown-menu';
 import { Dashboard } from './components/Dashboard';
 import { FileImport } from './components/FileImport';
 import { EmployeeList } from './components/EmployeeList';
 import { Charts } from './components/Charts';
-import { AdminPanel } from './components/AdminPanel';
-import { StatusLegend } from './components/StatusLegend';
+import { LoginPage } from './components/LoginPage';
+import { useAuth, AuthProvider } from './contexts/AuthContext';
 import { useStore } from './store/useStore';
 import { useLanguage, languageNames, languageFlags, Language } from './i18n';
 
-function App() {
+function AppContent() {
   const { theme, toggleTheme } = useStore();
   const { language, setLanguage, t } = useLanguage();
+  const { isAuthenticated, user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState('dashboard');
 
@@ -41,6 +44,11 @@ function App() {
       document.documentElement.classList.remove('dark');
     }
   }, [theme]);
+
+  // If not authenticated, show login page
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
 
   const navItems = [
     { id: 'dashboard', label: t.nav.dashboard, icon: LayoutDashboard },
@@ -79,6 +87,34 @@ function App() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* User Info Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="gap-2">
+                  <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white font-semibold">
+                    {user?.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="hidden md:block text-left">
+                    <p className="text-sm font-medium">{user?.name}</p>
+                    <p className="text-xs text-muted-foreground capitalize">{user?.role}</p>
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="px-2 py-1.5">
+                  <p className="text-sm font-medium">{user?.name}</p>
+                  <p className="text-xs text-muted-foreground">{user?.username}</p>
+                  <p className="text-xs text-muted-foreground capitalize">Role: {user?.role}</p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={logout} className="text-red-600 dark:text-red-400 cursor-pointer">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Chiqish
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Language Selector */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="rounded-full">
@@ -98,6 +134,8 @@ function App() {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
+
+            {/* Theme Toggle */}
             <Button
               variant="ghost"
               size="icon"
@@ -151,7 +189,6 @@ function App() {
 
           <TabsContent value="dashboard" className="animate-fade-in">
             <div className="space-y-6">
-              <StatusLegend />
               <Dashboard />
             </div>
           </TabsContent>
@@ -172,7 +209,7 @@ function App() {
 
           <TabsContent value="admin" className="animate-fade-in">
             <div className="max-w-4xl mx-auto">
-              <AdminPanel />
+              {/* Admin Panel component */}
             </div>
           </TabsContent>
         </Tabs>
@@ -185,6 +222,14 @@ function App() {
         </div>
       </footer>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
