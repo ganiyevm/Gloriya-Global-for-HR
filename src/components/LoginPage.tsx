@@ -26,18 +26,6 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const fillDemoCredentials = (role: 'admin' | 'accountant' | 'manager') => {
-    const credentials: Record<string, { username: string; password: string }> = {
-      admin: { username: 'admin', password: 'admin123' },
-      accountant: { username: 'accountant', password: 'acc123' },
-      manager: { username: 'manager', password: 'mgr123' },
-    };
-    const cred = credentials[role];
-    setUsername(cred.username);
-    setPassword(cred.password);
-    setError('');
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4">
       <div className="w-full max-w-md">

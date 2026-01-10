@@ -25,6 +25,7 @@ import { Dashboard } from './components/Dashboard';
 import { FileImport } from './components/FileImport';
 import { EmployeeList } from './components/EmployeeList';
 import { Charts } from './components/Charts';
+import { AdminPanel } from './components/AdminPanel';
 import { LoginPage } from './components/LoginPage';
 import { useAuth, AuthProvider } from './contexts/AuthContext';
 import { useStore } from './store/useStore';
@@ -50,13 +51,21 @@ function AppContent() {
     return <LoginPage />;
   }
 
-  const navItems = [
+  const allNavItems = [
     { id: 'dashboard', label: t.nav.dashboard, icon: LayoutDashboard },
     { id: 'charts', label: t.nav.charts, icon: BarChart3 },
     { id: 'employees', label: t.nav.employees, icon: Users },
-    { id: 'import', label: t.nav.import, icon: Upload },
-    { id: 'admin', label: t.nav.settings, icon: Settings },
+    { id: 'import', label: t.nav.import, icon: Upload, adminOnly: true },
+    { id: 'admin', label: t.nav.settings, icon: Settings, adminOnly: true },
   ];
+
+  // Filter nav items based on user role
+  const navItems = allNavItems.filter(item => {
+    if (item.adminOnly) {
+      return user?.role === 'admin';
+    }
+    return true;
+  });
 
   const languages: Language[] = ['uz', 'ru', 'en'];
 
@@ -209,7 +218,7 @@ function AppContent() {
 
           <TabsContent value="admin" className="animate-fade-in">
             <div className="max-w-4xl mx-auto">
-              {/* Admin Panel component */}
+              <AdminPanel />
             </div>
           </TabsContent>
         </Tabs>
