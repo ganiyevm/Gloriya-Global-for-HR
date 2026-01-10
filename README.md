@@ -6,48 +6,86 @@
 
 [![React](https://img.shields.io/badge/React-18.2-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.2-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-7.3-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![TailwindCSS](https://img.shields.io/badge/Tailwind-3.4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Express](https://img.shields.io/badge/Express.js-4.18-90C53F?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://neon.tech/)
+[![JWT](https://img.shields.io/badge/JWT-Secure-000000?style=for-the-badge&logo=json-web-tokens&logoColor=white)](https://jwt.io/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
-**Professional HR Analytics Platform** - Excel asosida ishlaydigan, zamonaviy React dashboard. Xodimlarning davomat va intizom ko'rsatkichlarini real vaqtda tahlil qiling.
+**Professional HR Analytics Platform** - Excel asosida ishlaydigan zamonaviy React dashboard bo'lib, backend API va PostgreSQL bilan to'liq integratsiyalashgan. Xodimlarning davomat va intizom ko'rsatkichlarini real vaqtda tahlil qiling.
 
-[🚀 Demo](#demo) • [📦 O'rnatish](#-ornatish) • [📖 Qo'llanma](#-foydalanish) • [🤝 Hissa qo'shish](#-hissa-qoshish)
+[🚀 Tezkor Boshlash](#-tezkor-boshlash) • [📦 O'rnatish](#-ornatish) • [📖 Qo'llanma](#-foydalanish) • [🏗️ Arxitektura](#-arxitektura)
 
 </div>
 
 ---
 
-## 📸 Skrinshotlar
+## ✅ Status: Fully Integrated & Production Ready
 
-<div align="center">
-<table>
-<tr>
-<td align="center"><b>Dashboard</b></td>
-<td align="center"><b>Grafiklar</b></td>
-</tr>
-<tr>
-<td><img src="docs/screenshots/dashboard.png" alt="Dashboard" width="400"/></td>
-<td><img src="docs/screenshots/charts.png" alt="Charts" width="400"/></td>
-</tr>
-<tr>
-<td align="center"><b>Xodimlar Ro'yxati</b></td>
-<td align="center"><b>Import</b></td>
-</tr>
-<tr>
-<td><img src="docs/screenshots/employees.png" alt="Employees" width="400"/></td>
-<td><img src="docs/screenshots/import.png" alt="Import" width="400"/></td>
-</tr>
-</table>
-</div>
+✅ **Frontend** - React 18 + TypeScript + Vite (http://localhost:5173)
+✅ **Backend** - Express.js + JWT Authentication (http://localhost:5001)  
+✅ **Database** - Neon PostgreSQL with full schema
+✅ **API Layer** - Centralized service for all backend calls
+✅ **Authentication** - JWT tokens with auto-expiry
+✅ **File Import** - Excel parsing + bulk database insert
+✅ **Real-time Data** - Frontend synced with database
 
 ---
 
-## ✨ Asosiy Xususiyatlar
+## 🚀 Tezkor Boshlash
 
-### 🌍 Ko'p Tilli Interfeys
-- **O'zbek** - Asosiy til
-- **Русский** - To'liq tarjima
+### Talablar
+- Node.js 22+
+- PostgreSQL (Neon account)
+- Git
+
+### O'rnatish va Ishga Tushirish
+
+```bash
+# Backend-ni ishga tushirish
+cd backend
+npm install
+npm run db:seed
+npm run dev
+# Server: http://localhost:5001
+
+# Frontend-ni ishga tushirish (yangi terminal)
+cd hr-analytics  
+npm install
+npm run dev
+# App: http://localhost:5173
+```
+
+### Test Credentials
+```
+Admin:
+  Username: admin
+  Password: password123
+
+Manager:
+  Username: manager
+  Password: password123
+
+Accountant:
+  Username: accountant
+  Password: password123
+```
+
+---
+
+## 📋 Documentation
+
+| Document | Maqsad |
+|----------|--------|
+| **INTEGRATION_COMPLETE.md** | To'liq integratsiya tavsifi |
+| **ARCHITECTURE.md** | Sistema arxitekturasi va diagrammalar |
+| **API_USAGE_GUIDE.md** | API xizmatini React komponentalarda qo'llash |
+| **DEVELOPMENT_CHECKLIST.md** | Keyingi bosqichlar va kod namunalari |
+| **DATA_FLOW.md** | Ma'lumot oqimining arxitekturasi |
+| **QUICK_START.md** | Tez ishlatiladigan qo'llanma |
+
+---
+
+## 🏗️ Arxitektura
 - **English** - International support
 
 ### 📥 Smart Import System

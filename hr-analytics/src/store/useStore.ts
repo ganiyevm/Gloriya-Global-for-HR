@@ -45,7 +45,7 @@ const initialFilters: FilterState = {
   dateFrom: '',
   dateTo: '',
   searchQuery: '',
-  sortBy: 'name',
+  sortBy: 'Name',
   sortOrder: 'asc',
 };
 

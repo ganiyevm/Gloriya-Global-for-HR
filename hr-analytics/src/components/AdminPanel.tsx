@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { 
   Trash2, 
   RotateCcw, 
@@ -22,11 +22,23 @@ import {
   DialogTrigger,
 } from './ui/dialog';
 import { useStore } from '../store/useStore';
-import { format } from 'date-fns';
+import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../i18n';
+
+// Date formatting function
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${day}.${month}.${year} ${hours}:${minutes}`;
+};
 
 export function AdminPanel() {
   const { t } = useLanguage();
+  const { user, logout } = useAuth();
   const [showClearDialog, setShowClearDialog] = useState(false);
   const [showRollbackDialog, setShowRollbackDialog] = useState(false);
   const [selectedRollbackId, setSelectedRollbackId] = useState<string | null>(null);
@@ -38,6 +50,41 @@ export function AdminPanel() {
     clearAllData,
     rollbackImport
   } = useStore();
+
+  // Check if user is admin every 10 seconds
+  useEffect(() => {
+    if (!user || user.role === 'admin') return;
+    
+    const checkInterval = setInterval(() => {
+      if (user?.role !== 'admin') {
+        console.warn('Non-admin user detected in AdminPanel, logging out');
+        logout();
+      }
+    }, 10 * 1000); // Check every 10 seconds
+
+    return () => clearInterval(checkInterval);
+  }, [user?.role, logout]);
+
+  // If not admin, show warning
+  if (!user || user?.role !== 'admin') {
+    return (
+      <Card className="border-destructive/50">
+        <CardContent className="pt-6">
+          <div className="flex items-center gap-4 p-4 bg-destructive/10 rounded-lg">
+            <AlertTriangle className="h-8 w-8 text-destructive" />
+            <div>
+              <p className="font-semibold text-destructive">
+                {t.admin?.title || 'Kirish rad etildi'}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {'Faqat admin foydalanuvchilar bu sahifaga kirishi mumkin'}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const handleClearData = () => {
     clearAllData();
@@ -52,7 +99,7 @@ export function AdminPanel() {
     }
   };
 
-  const stats = {
+  const stats = useMemo(() => ({
     totalEmployees: employees.length,
     totalRecords: attendance.length,
     totalImports: importHistory.length,
@@ -67,7 +114,7 @@ export function AdminPanel() {
       NS: attendance.filter(a => a.statusCode === 'NS').length,
       H: attendance.filter(a => a.statusCode === 'H').length,
     }
-  };
+  }), [employees, attendance, importHistory]);
 
   return (
     <div className="space-y-6">
@@ -188,7 +235,7 @@ export function AdminPanel() {
                     <div>
                       <p className="font-medium">{history.fileName}</p>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span>{format(new Date(history.importDate), 'dd.MM.yyyy HH:mm')}</span>
+                        <span>{formatDate(history.importDate)}</span>
                         <span>•</span>
                         <span>{history.recordsCount} {t.admin.records}</span>
                         {history.newEmployees > 0 && (

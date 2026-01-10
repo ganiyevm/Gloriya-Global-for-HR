@@ -5,8 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/
 import { Progress } from './ui/progress';
 import { Badge } from './ui/badge';
 import { useStore } from '../store/useStore';
+import { useAuth } from '../contexts/AuthContext';
 import { parseExcelFile } from '../utils/excelParser';
 import { processImportedEmployee } from '../utils/attendanceCalculator';
+import { attendanceAPI } from '../services/api';
 import type { ImportHistory } from '../types';
 import { useLanguage } from '../i18n';
 
@@ -18,6 +20,7 @@ interface PreviewData {
 
 export function FileImport() {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<PreviewData | null>(null);
@@ -137,7 +140,7 @@ export function FileImport() {
   };
 
   const handleImport = async () => {
-    if (!file) return;
+    if (!file || !user) return;
 
     setImportStatus('importing');
     setIsImporting(true);
@@ -162,7 +165,9 @@ export function FileImport() {
       let newEmployeesCount = 0;
       let updatedRecordsCount = 0;
       const totalItems = result.employees.length;
+      const attendanceRecords = [];
 
+      // Process employees locally and prepare records for API with employee metadata
       for (let i = 0; i < result.employees.length; i++) {
         const importedEmployee = result.employees[i];
         const { employee, records } = processImportedEmployee(importedEmployee, result.dateColumns);
@@ -182,9 +187,29 @@ export function FileImport() {
             updatedRecordsCount++;
           }
           upsertAttendanceRecord(record);
+          
+          // Enrich record with employee metadata for backend
+          attendanceRecords.push({
+            ...record,
+            employeeName: employee.name,
+            department: employee.department
+          });
         }
 
-        setImportProgress(Math.round(((i + 1) / totalItems) * 100));
+        setImportProgress(Math.round(((i + 1) / totalItems) * 50));
+      }
+
+      // Send attendance records with employee info to backend API
+      setImportProgress(60);
+      try {
+        await attendanceAPI.bulkImport(attendanceRecords, user.token);
+        setImportProgress(100);
+      } catch (apiError) {
+        console.error('API Error:', apiError);
+        setErrors([apiError instanceof Error ? apiError.message : 'Failed to import data to database']);
+        setImportStatus('error');
+        setIsImporting(false);
+        return;
       }
 
       const historyEntry: ImportHistory = {
